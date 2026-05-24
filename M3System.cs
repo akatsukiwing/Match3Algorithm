@@ -77,16 +77,197 @@ public static class M3System
         b1 = Case2Solution(primitive);
 
         if (b1) return true;
-        /*
+        
         b1 = Case3Solution();
 
         if (b1) return true;
-        */
+        
         return false;
     }
 
     private static bool Case3Solution()
     {
+        var b = AllOrphan();
+
+        return b;
+    }
+
+    private static bool AllOrphan()
+    {
+        for (var i = 0; i < AllNums; i++)
+        {
+            var r = i / ColNums;
+            var c = i % ColNums;
+
+            var b = CheckUp4(r, c);
+
+            if(b) return true;
+
+            b = CheckLeft4(r, c);
+
+            if (b) return true;
+
+            b = CheckRight4(r, c);
+
+            if (b) return true;
+
+            b = CheckDown4(r, c);
+
+            if (b) return true;
+        }
+
+        return false;
+    }
+
+    private static bool CheckDown4(int r, int c)
+    {
+        if (r + 2 > RowNums - 1) return false;
+
+        var index = r * ColNums + c;
+
+        var aimindex = (r + 2) * ColNums + c;
+
+        if (Stage[index] == Stage[aimindex])
+        {
+            if (c - 1 >= 0)
+            {
+                var aim2index = (r + 1) * ColNums + c - 1;
+
+                if (Stage[index] == Stage[aim2index]) return true;
+                else
+                {
+                    Stage[aim2index].Value = Stage[index].Value;
+                    return true;
+                }
+            }
+
+            if (c + 1 <= ColNums - 1)
+            {
+                var aim2index = (r + 1) * ColNums + c + 1;
+
+                if (Stage[index] == Stage[aim2index]) return true;
+                else
+                {
+                    Stage[aim2index].Value = Stage[index].Value;
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private static bool CheckRight4(int r, int c)
+    {
+        if (c + 2 > ColNums - 1) return false;
+
+        var index = r * ColNums + c;
+
+        var aimindex = r * ColNums + c + 2;
+
+        if (Stage[index] == Stage[aimindex])
+        {
+            if (r - 1 >= 0)
+            {
+                var aim2index = (r - 1) * ColNums + c + 1;
+
+                if (Stage[index] == Stage[aim2index]) return true;
+                else
+                {
+                    Stage[aim2index].Value = Stage[index].Value;
+                    return true;
+                }
+            }
+
+            if (r + 1 <= RowNums - 1)
+            {
+                var aim2index = (r + 1) * ColNums + c + 1;
+
+                if (Stage[index] == Stage[aim2index]) return true;
+                else
+                {
+                    Stage[aim2index].Value = Stage[index].Value;
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private static bool CheckLeft4(int r, int c)
+    {
+        if (c - 2 < 0) return false;
+
+        var index = r * ColNums + c;
+
+        var aimindex = r * ColNums + c - 2;
+
+        if (Stage[index] == Stage[aimindex])
+        {
+            if (r - 1 >= 0)
+            {
+                var aim2index = (r - 1) * ColNums + c - 1;
+
+                if (Stage[index] == Stage[aim2index]) return true;
+                else
+                {
+                    Stage[aim2index].Value = Stage[index].Value;
+                    return true;
+                }
+            }
+
+            if (r + 1 <= RowNums - 1 )
+            {
+                var aim2index = (r + 1) * ColNums + c - 1;
+
+                if (Stage[index] == Stage[aim2index]) return true;
+                else
+                {
+                    Stage[aim2index].Value = Stage[index].Value;
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private static bool CheckUp4(int r, int c)
+    {
+        if (r - 2 < 0) return false;
+        
+        var index = r * ColNums + c;
+
+        var aimindex = (r - 2) * ColNums + c;
+
+        if (Stage[index] == Stage[aimindex])
+        {
+            if (c - 1 >= 0)
+            {
+                var aim2index = (r - 1) * ColNums + c - 1;
+
+                if (Stage[index] == Stage[aim2index]) return true;
+                else
+                {
+                    Stage[aim2index].Value = Stage[index].Value;
+                    return true;
+                }
+            }
+
+            if(c + 1 <= ColNums - 1)
+            {
+                var aim2index = (r - 1) * ColNums + c + 1;
+
+                if (Stage[index] == Stage[aim2index]) return true;
+                else
+                {
+                    Stage[aim2index].Value = Stage[index].Value;
+                    return true;
+                }
+            }
+        }
+
         return false;
     }
 
@@ -782,5 +963,10 @@ public static class M3System
         }
 
         Debug.Log("pass");
+    }
+
+    public static void Test2(List<pson> stage)
+    {
+        
     }
 }
