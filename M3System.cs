@@ -6,9 +6,9 @@ using UnityEngine;
 
 public static class M3System 
 {
-    private static int _rowNums { get; set; } = 3;
+    private static int _rowNums { get; set; } = 7;
 
-    private static int _colNums { get; set; } = 3;
+    private static int _colNums { get; set; } = 5;
 
     public static int RowNums
     {
@@ -41,6 +41,9 @@ public static class M3System
 
     public static List<pson> Stage { get; set; } = new();
 
+
+
+
     public static void init(int row, int col)
     {
         
@@ -55,10 +58,10 @@ public static class M3System
 
         var s = MakeASolution();
 
-        //if (s)
-        //    Debug.Log("lol");
-        //else
-        //    Debug.Log("wow");
+        if (s)
+            Debug.Log("lol");
+        else
+            Debug.Log("wow");
     }
 
     private static bool MakeASolution()
@@ -673,13 +676,6 @@ public static class M3System
             allprimitive.Add(primitive);
         }
 
-        foreach (var item in allprimitive)
-        {
-            Debug.Log(item.Count);
-        }
-
-        Debug.Log(waitcheck.Count);
-
         return allprimitive;
     }
 
@@ -933,9 +929,299 @@ public static class M3System
         return list;
     }
 
+    public static void GetTempStage(int index1, int index2,out List<pson> temp)
+    {
+        temp = new();
+
+        temp.AddRange(Stage);
+
+        temp[index1] = new (Stage[index2].Value);
+        temp[index2] = new ( Stage[index1].Value);
+    }
+
+    public static bool CheckSwitchValid(int index1, int index2)
+    {
+        var r1 = index1 / ColNums;
+        var r2 = index2 / ColNums;
+
+        var c1 = index1 % ColNums;
+        var c2 = index2 % ColNums;
+
+        if (Math.Abs(r1 - r2) == 1 || Math.Abs(c1 - c2) == 1) return true;
+
+        return false;
+    }
+
+    public static bool DoSwitchTwoItem(int index1, int index2,out List<pson> nextstage, out List<int> primitive1,out List<int> primitive2)
+    {
+        nextstage = null;
+
+        GetTempStage(index1, index2, out var tempstage);
+
+        primitive1 = new List<int>();
+        primitive2 = new List<int>();
+
+        CheckAtIndex(index1, tempstage, primitive1);
+        CheckAtIndex(index2, tempstage, primitive2);
+
+        Debug.Log("primitivenums: " + primitive1.Count + " " + primitive2.Count);
+
+        if (primitive1.Count >= 2)
+        {
+            primitive1.Add(index1);
+        }
+        if (primitive2.Count >= 2)
+        {
+            primitive2.Add(index2);
+        }
+
+        if (primitive1.Count >= 3 || primitive2.Count >= 3)
+        {
+            nextstage = tempstage;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    static void CheckAtIndex(int index, List<pson> useStage,List<int> result)
+    {
+        var r = index / ColNums;
+        var c = index % ColNums;
+
+        var type = useStage[index];
+
+        CheckLeft5(r, c,type,useStage, result);
+        CheckRight5(r, c, type, useStage, result);
+        CheckUp5(r, c, type, useStage, result);
+        CheckDown5(r, c, type, useStage, result);
+    }
+
+    private static void CheckDown5(int r, int c, pson type, List<pson> useStage, List<int> delemtents,int depth = 1)
+    {
+        if (r > RowNums - 1) return;
+
+        var dd = r + depth;
+
+        if (dd > RowNums - 1) return;
+
+        var index = dd * ColNums + c;
+
+        if (type == useStage[index])
+        {
+            depth++;
+            if (!delemtents.Contains(index))
+                delemtents.Add(index);
+
+            CheckDown5(r, c,type,useStage, delemtents, depth);
+        }
+    }
+
+    private static void CheckUp5(int r, int c, pson type, List<pson> useStage,List<int> delemtents, int depth = 1)
+    {
+        if (r < 0) return;
+
+        var dd = r - depth;
+
+        if (dd < 0) return;
+
+        var index = dd * ColNums + c;
+
+        if (type == useStage[index])
+        {
+            depth++;
+            if (!delemtents.Contains(index))
+                delemtents.Add(index);
+
+            CheckUp5(r, c, type, useStage, delemtents, depth);
+        }
+    }
+
+    private static void CheckRight5(int r, int c, pson type, List<pson> useStage,List<int> delemtents, int depth = 1)
+    {
+        if (c > ColNums - 1) return;
+
+        var dd = c + depth;
+
+        if (dd > ColNums - 1) return;
+
+        var index = r * ColNums + dd;
+
+        if (type == useStage[index])
+        {
+            depth++;
+            if (!delemtents.Contains(index))
+                delemtents.Add(index);
+
+            CheckRight5(r, c,type,useStage, delemtents, depth);
+        }
+    }
+
+    private static void CheckLeft5(int r, int c, pson type, List<pson> useStage,List<int> delemtents, int depth = 1)
+    {
+        if (c < 0) return;
+
+        var dd = c - depth;
+
+        if (dd < 0) return;
+
+        var index = r * ColNums + dd;
+        
+        if (type == useStage[index])
+        {
+            depth++;
+            if (!delemtents.Contains(index))
+                delemtents.Add(index);
+
+            CheckLeft5(r, c,type,useStage, delemtents, depth);
+        }
+    }
 
 
+    public static void EreaseItem(List<List<int>> primitives)
+    {
+        foreach (var p in primitives)
+        {
+            if (p.Count >= 3)
+            {
+                foreach (var i in p)
+                {
+                    Stage[i] = null;
+                }
+            }
+        }
+    }
 
+
+    public static void ItemFallDown(List<List<int>> primitives,out List<List<(int,int)>> infos)
+    {
+        infos = new();
+
+        foreach (var p in primitives)
+        {
+            if (p.Count < 3) continue;
+
+            p.Sort();
+            p.Reverse();
+
+            foreach (var pos in p)
+            {
+                var info = new List<(int, int)>();
+
+                CheckUp6(pos,p,ref info);
+
+                if(info.Count > 0)
+                    infos.Add(info);
+            }
+        }
+
+        /*
+        foreach (var i in infos)
+        {
+            foreach(var ii in i)
+            {
+                Debug.Log("fallto: " + ii.Item1 + " " + "fallfrom: " + ii.Item2);
+                Debug.Log("type: " + Stage[ii.Item1] + " | " + Stage[ii.Item2]);
+             }
+        }
+        */
+    }
+
+    static void CheckUp6(int index,List<int> selfprimitive, ref List<(int,int)> result,int depth = 1)
+    {
+        if (Stage[index] != null) return;
+
+        var r = index / ColNums;
+        var c = index % ColNums;
+
+        var dd = r - depth;
+
+        if (dd < 0) return;
+
+        var fallform = dd * ColNums + c;
+
+        if (Stage[fallform] == null)
+        {
+            depth++;
+            CheckUp6(index,selfprimitive, ref result,depth);
+        }
+        else
+        {
+            result.Add((index,fallform));
+
+            Stage[index] = Stage[fallform];
+            Stage[fallform] = null;
+
+            var next = (r - 1) * ColNums + c;
+
+            if (!selfprimitive.Contains(next))
+                CheckUp6(next,selfprimitive, ref result, 1);
+        }
+    }
+
+    public static void SpawnItem(out List<(int,int)> types)
+    { 
+        types = new List<(int, int)>();
+
+        for (var i = 0; i < AllNums; i++)
+        {
+            if (Stage[i] == null)
+            {
+                var r = new System.Random();
+                Stage[i] = new(r.Next(pson.Zero, pson.nums));
+                types.Add((i, Stage[i]));
+            }
+        }
+
+    }
+
+    //could have addition item
+    //need test
+    public static void CheckAllElement2(out List<List<int>> primitive)
+    {
+        primitive = new List<List<int>>();
+
+        var primitives = IdentifyPrimitive();
+
+        foreach (var p in primitives)
+        {
+            
+            var g1 = p.GroupBy(e => e / ColNums, e => e);
+            var g2 = p.GroupBy(e => e % ColNums, e => e);
+
+            var hash = new HashSet<int>();
+
+            foreach (var g in g1)
+            {
+                if (g.Count() < 3) continue;
+
+                foreach (var pos in g)
+                {
+                    hash.Add(pos);
+                }       
+            }
+
+            foreach (var g in g2)
+            {
+                if (g.Count() < 3) continue;
+
+                foreach (var pos in g)
+                {
+                    hash.Add(pos);
+                }
+            }
+
+            var result = hash.ToList();
+
+            if (result.Count >= 3)
+                primitive.Add(result);
+            
+        }
+    }
+
+
+    #region Test
     public static void Test1(List<pson> stage)
     {
         for (var i = 0; i < AllNums; i++)
@@ -965,8 +1251,5 @@ public static class M3System
         Debug.Log("pass");
     }
 
-    public static void Test2(List<pson> stage)
-    {
-        
-    }
+    #endregion
 }

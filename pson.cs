@@ -1,6 +1,7 @@
 using System;
 
 //c# 9.0
+[System.Serializable]
 public class pson
 {
     public pson(int value)
@@ -10,7 +11,22 @@ public class pson
 
     public static int Zero => 0;
 
-    public static int CurrentMax { get; set; } = 3;
+    private static int _max { get; set; } = 3;
+
+    public static int CurrentMax
+    {
+        get 
+        {
+            if (_max < 3) _max = 3;
+
+            return _max;
+        }
+
+        set
+        {
+            _max = value;
+        }
+    }
 
     public static int nums => CurrentMax + 1;
 
@@ -49,42 +65,46 @@ public class pson
 
     public static bool operator >(pson left, pson right)
     {
-        if (left.Value > right.Value) return true;
+        if (left?.Value > right?.Value) return true;
 
         return false;
     }
 
     public static bool operator <(pson left, pson right)
     {
-        if (left.Value < right.Value) return true;
+        if (left?.Value < right?.Value) return true;
 
         return false;
     }
 
     public static bool operator >=(pson left, pson right)
     {
-        if (left.Value >= right.Value) return true;
+        if (left?.Value >= right?.Value) return true;
 
         return false;
     }
 
     public static bool operator <=(pson left, pson right)
     {
-        if (left.Value <= right.Value) return true;
+        if (left?.Value <= right?.Value) return true;
 
         return false;
     }
 
     public static bool operator ==(pson left, pson right)
     {
-        if (left.Value == right.Value) return true;
+        if (left is null && right is null) return true;
+
+        if (left?.Value == right?.Value) return true;
 
         return false;
     }
 
     public static bool operator !=(pson left, pson right)
     {
-        if (left.Value != right.Value) return true;
+        if (left is null && right is null) return false;
+
+        if (left?.Value != right?.Value) return true;
 
         return false;
     }
@@ -124,7 +144,8 @@ public class pson
     public override bool Equals(object obj)
     {
         return obj is pson pson &&
-               Value == pson.Value;
+               Value == pson.Value
+               && pson is not null;
     }
 
     public override int GetHashCode()
