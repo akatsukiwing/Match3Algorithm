@@ -969,10 +969,18 @@ public static class M3System
         if (primitive1.Count >= 2)
         {
             primitive1.Add(index1);
+
+            CheckPrimitive(primitive1, out var vp1);
+
+            primitive1 = vp1;
         }
         if (primitive2.Count >= 2)
         {
             primitive2.Add(index2);
+
+            CheckPrimitive(primitive2, out var vp2);
+
+            primitive2 = vp2;
         }
 
         if (primitive1.Count >= 3 || primitive2.Count >= 3)
@@ -1176,8 +1184,6 @@ public static class M3System
 
     }
 
-    //could have addition item
-    //need test
     public static void CheckAllElement2(out List<List<int>> primitive)
     {
         primitive = new List<List<int>>();
@@ -1186,41 +1192,113 @@ public static class M3System
 
         foreach (var p in primitives)
         {
-            
-            var g1 = p.GroupBy(e => e / ColNums, e => e);
-            var g2 = p.GroupBy(e => e % ColNums, e => e);
 
-            var hash = new HashSet<int>();
+            CheckPrimitive(p, out var result);
 
-            foreach (var g in g1)
-            {
-                if (g.Count() < 3) continue;
-
-                foreach (var pos in g)
-                {
-                    hash.Add(pos);
-                }       
-            }
-
-            foreach (var g in g2)
-            {
-                if (g.Count() < 3) continue;
-
-                foreach (var pos in g)
-                {
-                    hash.Add(pos);
-                }
-            }
-
-            var result = hash.ToList();
-
-            if (result.Count >= 3)
+            if (result.Count > 0)
                 primitive.Add(result);
-            
+
+
         }
     }
 
 
+    //could have addition item
+    //same row or same col could gap same bolcks 
+    //need test
+    static void CheckPrimitive(List<int> primitive, out List<int> validp)
+    {
+        validp = new List<int>();
+
+        var g1 = primitive.GroupBy(e => e / ColNums, e => e);
+        var g2 = primitive.GroupBy(e => e % ColNums, e => e);
+
+        var hash = new HashSet<int>();
+
+        foreach (var g in g1)
+        {
+            if (g.Count() < 3) continue;
+
+            CheckPrimitive2(g.ToList(), 1, ref hash);
+            //foreach (var pos in g)
+            //{
+            //    hash.Add(pos);
+            //}
+        }
+
+        foreach (var g in g2)
+        {
+            if (g.Count() < 3) continue;
+
+            CheckPrimitive2(g.ToList(), ColNums, ref hash);
+            //foreach (var pos in g)
+            //{
+            //    hash.Add(pos);
+            //}
+        }
+
+        var result = hash.ToList();
+        //Debug.Log("valid primitive count: " + result.Count);
+        if (result.Count >= 3)
+            validp.AddRange(result);
+    }
+
+
+    //Stage size may effect
+    //matchn shape may effect
+    static void CheckPrimitive2(List<int> primitive,int limit, ref HashSet<int> result)
+    {
+        primitive.Sort();
+
+        var last = 0;
+        var lastcheck = 0;
+        var current = 1;
+
+        while (current < primitive.Count)
+        {
+           
+            if (primitive[current] - primitive[lastcheck] == limit)
+            {
+                if (current == primitive.Count - 1)
+                {
+                    if (current - last >= 2)
+                    {
+                        for (var i = last; i <= current; i++)
+                        {
+                            result.Add(primitive[i]);
+                        }
+                    }
+                }
+
+                lastcheck++;
+                current++;
+            }
+            else
+            {
+                if (current - last >= 2)
+                {
+                    for (var i = last; i <= current; i++)
+                    {
+                        result.Add(primitive[i]);
+                    }
+
+                    last = current + 1;
+                    lastcheck = current + 1;
+                    current += 2;
+                }
+                else
+                {
+                    last = current;
+                    lastcheck = current;
+                    current++;
+                }
+            }
+        }
+
+    }
+
+
+    
     #region Test
     public static void Test1(List<pson> stage)
     {
