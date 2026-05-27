@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Burst;
 using UnityEngine;
 
 public static class M3System 
@@ -43,7 +44,7 @@ public static class M3System
 
 
 
-
+    [BurstCompile]
     public static void init(int row, int col)
     {
         
@@ -64,6 +65,7 @@ public static class M3System
             Debug.Log("wow");
     }
 
+    [BurstCompile]
     private static bool MakeASolution()
     {
         var primitive = IdentifyPrimitive();
@@ -787,6 +789,7 @@ public static class M3System
         }
     }
 
+    [BurstCompile]
     private static void CheckAllElemtent(int row, int col)
     {
 
@@ -947,7 +950,8 @@ public static class M3System
         var c1 = index1 % ColNums;
         var c2 = index2 % ColNums;
 
-        if (Math.Abs(r1 - r2) == 1 || Math.Abs(c1 - c2) == 1) return true;
+        if (Math.Abs(r1 - r2) == 1 && Math.Abs(c1 - c2) == 0) return true;
+        else if (Math.Abs(r1 - r2) == 0 && Math.Abs(c1 - c2) == 1) return true;
 
         return false;
     }
@@ -964,7 +968,7 @@ public static class M3System
         CheckAtIndex(index1, tempstage, primitive1);
         CheckAtIndex(index2, tempstage, primitive2);
 
-        Debug.Log("primitivenums: " + primitive1.Count + " " + primitive2.Count);
+        //Debug.Log("primitivenums: " + primitive1.Count + " " + primitive2.Count);
 
         if (primitive1.Count >= 2)
         {
@@ -1184,6 +1188,7 @@ public static class M3System
 
     }
 
+    [BurstCompile]
     public static void CheckAllElement2(out List<List<int>> primitive)
     {
         primitive = new List<List<int>>();
@@ -1197,7 +1202,6 @@ public static class M3System
 
             if (result.Count > 0)
                 primitive.Add(result);
-
 
         }
     }
@@ -1219,7 +1223,8 @@ public static class M3System
         {
             if (g.Count() < 3) continue;
 
-            CheckPrimitive2(g.ToList(), 1, ref hash);
+            CheckPrimitiveWithRow(g.ToList(), ref hash);
+            //CheckPrimitive2(g.ToList(), 1, ref hash);
             //foreach (var pos in g)
             //{
             //    hash.Add(pos);
@@ -1230,7 +1235,8 @@ public static class M3System
         {
             if (g.Count() < 3) continue;
 
-            CheckPrimitive2(g.ToList(), ColNums, ref hash);
+            CheckPrimitiveWithCol(g.ToList(), ref hash);
+            //CheckPrimitive2(g.ToList(), ColNums, ref hash);
             //foreach (var pos in g)
             //{
             //    hash.Add(pos);
@@ -1256,7 +1262,6 @@ public static class M3System
 
         while (current < primitive.Count)
         {
-           
             if (primitive[current] - primitive[lastcheck] == limit)
             {
                 if (current == primitive.Count - 1)
@@ -1298,7 +1303,147 @@ public static class M3System
     }
 
 
-    
+    static void CheckPrimitiveWithRow(List<int> primitive, ref HashSet<int> result)
+    {
+        primitive.Sort();
+
+        var last = 0;
+        var lastcheck = 0;
+        var current = 1;
+
+        while (current < primitive.Count)
+        {
+            var r1 = primitive[current] / ColNums;
+            var r2 = primitive[lastcheck] / ColNums;
+
+            var c1 = primitive[current] % ColNums;
+            var c2 = primitive[lastcheck] % ColNums;
+
+            if (r1 == r2)
+            {
+                if (c1 - c2 == 1)
+                {
+                    if (current == primitive.Count - 1)
+                    {
+                        if (current - last >= 2)
+                        {
+                            for (var i = last; i <= current; i++)
+                            {
+                                result.Add(primitive[i]);
+                            }
+                        }
+                    }
+
+                    lastcheck++;
+                    current++;
+                }
+                else
+                {
+                    if (lastcheck - last >= 2)
+                    {
+                        for (var i = last; i <= lastcheck; i++)
+                        {
+                            result.Add(primitive[i]);
+                        }
+
+
+                    }
+
+                    last = current;
+                    lastcheck = current;
+                    current++;
+
+                }
+            }
+            else
+            {
+                if (lastcheck - last >= 2)
+                {
+                    for (var i = last; i <= lastcheck; i++)
+                    {
+                        result.Add(primitive[i]);
+                    }
+
+                }
+
+                last = current;
+                lastcheck = current;
+                current++;
+            }
+        }
+    }
+
+    static void CheckPrimitiveWithCol(List<int> primitive, ref HashSet<int> result)
+    {
+        primitive.Sort();
+
+        var last = 0;
+        var lastcheck = 0;
+        var current = 1;
+
+        while (current < primitive.Count)
+        {
+            var r1 = primitive[current] / ColNums;
+            var r2 = primitive[lastcheck] / ColNums;
+
+            var c1 = primitive[current] % ColNums;
+            var c2 = primitive[lastcheck] % ColNums;
+
+
+            if (c1 == c2)
+            {
+                if (r1 - r2 == 1)
+                {
+                    if (current == primitive.Count - 1)
+                    {
+                        if (current - last >= 2)
+                        {
+                            for (var i = last; i <= current; i++)
+                            {
+                                result.Add(primitive[i]);
+                            }
+                        }
+                    }
+
+                    lastcheck++;
+                    current++;
+
+                }
+                else
+                {
+                    if (lastcheck - last >= 2)
+                    {
+                        for (var i = last; i <= lastcheck; i++)
+                        {
+                            result.Add(primitive[i]);
+                        }
+                    }
+
+                    last = current;
+                    lastcheck = current;
+                    current++;
+
+                }
+
+            }
+            else
+            {
+                if (lastcheck - last >= 2)
+                {
+                    for (var i = last; i <= lastcheck; i++)
+                    {
+                        result.Add(primitive[i]);
+                    }
+                }
+
+                last = current;
+                lastcheck = current;
+                current++;
+            }
+        }
+    }
+
+
     #region Test
     public static void Test1(List<pson> stage)
     {
