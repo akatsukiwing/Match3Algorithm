@@ -40,7 +40,7 @@ public static class M3System
 
     public static int AllNums => RowNums * ColNums;
 
-    public static List<pson> Stage { get; set; } = new();
+    public static List<LoopNum> Stage { get; set; } = new();
 
 
 
@@ -51,7 +51,7 @@ public static class M3System
         for (var i = 0; i < AllNums; i++)
         {
             var r = new System.Random();
-            Stage.Add(r.Next(pson.Zero, pson.nums));
+            Stage.Add(r.Next(LoopNum.Zero, LoopNum.nums));
         }
 
         CheckAllElemtent(row,col);
@@ -899,7 +899,7 @@ public static class M3System
 
     static void ReRoll(int r, int c)
     {
-        var type = Enumerable.Range(pson.Zero, pson.nums)
+        var type = Enumerable.Range(LoopNum.Zero, LoopNum.nums)
             .Except(CheckNeighborhood(r, c))
             .FirstOrDefault();
 
@@ -932,7 +932,7 @@ public static class M3System
         return list;
     }
 
-    public static void GetTempStage(int index1, int index2,out List<pson> temp)
+    public static void GetTempStage(int index1, int index2,out List<LoopNum> temp)
     {
         temp = new();
 
@@ -956,7 +956,7 @@ public static class M3System
         return false;
     }
 
-    public static bool DoSwitchTwoItem(int index1, int index2,out List<pson> nextstage, out List<int> primitive1,out List<int> primitive2)
+    public static bool DoSwitchTwoItem(int index1, int index2,out List<LoopNum> nextstage, out List<int> primitive1,out List<int> primitive2)
     {
         nextstage = null;
 
@@ -997,7 +997,7 @@ public static class M3System
         return false;
     }
 
-    static void CheckAtIndex(int index, List<pson> useStage,List<int> result)
+    static void CheckAtIndex(int index, List<LoopNum> useStage,List<int> result)
     {
         var r = index / ColNums;
         var c = index % ColNums;
@@ -1010,7 +1010,7 @@ public static class M3System
         CheckDown5(r, c, type, useStage, result);
     }
 
-    private static void CheckDown5(int r, int c, pson type, List<pson> useStage, List<int> delemtents,int depth = 1)
+    private static void CheckDown5(int r, int c, LoopNum type, List<LoopNum> useStage, List<int> delemtents,int depth = 1)
     {
         if (r > RowNums - 1) return;
 
@@ -1030,7 +1030,7 @@ public static class M3System
         }
     }
 
-    private static void CheckUp5(int r, int c, pson type, List<pson> useStage,List<int> delemtents, int depth = 1)
+    private static void CheckUp5(int r, int c, LoopNum type, List<LoopNum> useStage,List<int> delemtents, int depth = 1)
     {
         if (r < 0) return;
 
@@ -1050,7 +1050,7 @@ public static class M3System
         }
     }
 
-    private static void CheckRight5(int r, int c, pson type, List<pson> useStage,List<int> delemtents, int depth = 1)
+    private static void CheckRight5(int r, int c, LoopNum type, List<LoopNum> useStage,List<int> delemtents, int depth = 1)
     {
         if (c > ColNums - 1) return;
 
@@ -1070,7 +1070,7 @@ public static class M3System
         }
     }
 
-    private static void CheckLeft5(int r, int c, pson type, List<pson> useStage,List<int> delemtents, int depth = 1)
+    private static void CheckLeft5(int r, int c, LoopNum type, List<LoopNum> useStage,List<int> delemtents, int depth = 1)
     {
         if (c < 0) return;
 
@@ -1181,7 +1181,7 @@ public static class M3System
             if (Stage[i] == null)
             {
                 var r = new System.Random();
-                Stage[i] = new(r.Next(pson.Zero, pson.nums));
+                Stage[i] = new(r.Next(LoopNum.Zero, LoopNum.nums));
                 types.Add((i, Stage[i]));
             }
         }
@@ -1445,7 +1445,7 @@ public static class M3System
 
 
     #region Test
-    public static void Test1(List<pson> stage)
+    public static void Test1(List<LoopNum> stage)
     {
         for (var i = 0; i < AllNums; i++)
         {
