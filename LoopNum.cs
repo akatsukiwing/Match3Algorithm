@@ -128,7 +128,7 @@ public class LoopNum
         if (result > CurrentMax)
             result %= nums;
         else if (result < 0)
-            result = _max - Math.Abs(result) % _max;
+            result = nums - Math.Abs(result) % nums;
    
 
         return new LoopNum(result);
@@ -141,16 +141,16 @@ public class LoopNum
         if (result > CurrentMax)
             result %= nums;
         else if (result < 0)
-            result = _max - Math.Abs(result) % _max;
+            result = nums - Math.Abs(result) % nums;
 
         return new LoopNum(result);
     }
 
     public override bool Equals(object obj)
     {
-        return obj is LoopNum pson &&
-               Value == pson.Value
-               && pson is not null;
+        return obj is LoopNum lnum &&
+               Value == lnum.Value
+               && lnum is not null;
     }
 
     public override int GetHashCode()
