@@ -128,7 +128,8 @@ public class LoopNum
         if (result > CurrentMax)
             result %= nums;
         else if (result < 0)
-            result = Math.Abs(result) % _max + 1;
+            result = _max - Math.Abs(result) % _max;
+   
 
         return new LoopNum(result);
     }
@@ -140,7 +141,7 @@ public class LoopNum
         if (result > CurrentMax)
             result %= nums;
         else if (result < 0)
-            result = Math.Abs(result) % _max + 1;
+            result = _max - Math.Abs(result) % _max;
 
         return new LoopNum(result);
     }
